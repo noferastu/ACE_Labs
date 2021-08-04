@@ -7,16 +7,27 @@ In this lab you'll learn how to configure the Keptn library for Jenkins.
 
 Following the `everything as code` best practice, we will update the Jenkins deployment using Helm.
 
-1. On the bastion and run the commands below to add the required libraries to the Jenkins deployment:
+1. On the bastion run the command below (make sure to copy all lines) to add the required keptn libraries to the Jenkins deployment:
 
     ```bash
-    (bastion)$ cd
-    (bastion)$ rm ~/jenkins/helm/jenkins-values.yml && mv ~/jenkins/helm/jenkins-values-keptn.yml ~/jenkins/helm/jenkins-values.yml
+    (bastion)$ cat << EOF | sed -i '/.*libraries:$/ r /dev/stdin' ~/jenkins/helm/jenkins-values.yml
+                - defaultVersion: "master"
+                  name: "keptn-library"
+                  retriever:
+                    modernSCM:
+                      scm:
+                        git:
+                          remote: "https://github.com/keptn-sandbox/keptn-jenkins-library.git"
+                          traits:
+                          - "gitBranchDiscovery"
+    EOF
     ```
 
-1. The following code block was added to the Jenkins values file.
+1. After adding the keptn Jenkins libraries, the Jenkins global libraries configuration block looks like this:
 
     ```yaml
+          globalLibraries:
+            libraries:
             - defaultVersion: "master"
               name: "keptn-library"
               retriever:
@@ -26,29 +37,14 @@ Following the `everything as code` best practice, we will update the Jenkins dep
                       remote: "https://github.com/keptn-sandbox/keptn-jenkins-library.git"
                       traits:
                       - "gitBranchDiscovery"
-    ```
-
-1. After adding the keptn Jenkins libraries, the Jenkins global libraries code block looks like this:
-
-    ```yaml
-          globalLibraries:
-            libraries:
-            - name: "dynatrace"
+            - defaultVersion: "master"
+              name: "dynatrace"
               retriever:
                 modernSCM:
                   scm:
                     git:
                       id: "6813bac3-894e-434d-9abb-bd41eeb72f88"
                       remote: "https://github.com/dynatrace-ace/dynatrace-jenkins-library.git"
-                      traits:
-                      - "gitBranchDiscovery"
-            - defaultVersion: "master"
-              name: "keptn-library"
-              retriever:
-                modernSCM:
-                  scm:
-                    git:
-                      remote: "https://github.com/keptn-sandbox/keptn-jenkins-library.git"
                       traits:
                       - "gitBranchDiscovery"
     ```
